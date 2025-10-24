@@ -57,6 +57,25 @@ Cliente envía:
 Mensaje → [Cifrar con clave pública del Servidor] → 🔒
 → [Servidor descifra con su clave privada] → Mensaje
 
+¿Qué es SHA256?
+SHA-256 es una función de hash criptográfico que genera un “resumen” único de un mensaje.
+
+Características:
+
+- Garantiza integridad de los mensajes
+- Permite autenticar al remitente
+- ⚠️ No cifra el contenido, cualquiera podría leerlo
+- 🔑 Requiere gestión de claves públicas y privadas
+
+¿Cómo funciona?
+Servidor envía:
+Mensaje → [SHA-256 y firma con clave privada] → 🔏
+→ [Cliente verifica firma con clave pública] → Mensaje verificado
+
+Cliente envía:
+Mensaje → [SHA-256 y firma con clave privada] → 🔏
+→ [Servidor verifica firma con clave pública] → Mensaje verificado
+
 Versiones
 
 Version 1.0 - Chat básico sin cifrado
@@ -66,5 +85,9 @@ Version 1.0 - Chat básico sin cifrado
 Version 1.10 - Chat con cifrado simétrico y asimétrico
 - servidorSimetrico.py (MD5: 26d8fb2f690c6ab5277c8005da368541616a0676)
 - clienteSimetrico.py (MD5: 546a24a8b40a2a66c3bde4aa05682d0f021a5dc6)
-- servidorAsimetrico.py (MD5: e841991154858ded0990be670d48e9509fc0cfb8)
+- servidorAsimetrico.py (MD5:e841991154858ded0990be670d48e9509fc0cfb8)
 - clienteAsimetrico.py (MD5: 9016697fa7720eadbd831a780e58cd5d30b98722)
+
+Version 1.20 -Chat con SHA256
+- clienteSha.py (MD5: 0185d1f222496ce1b1c2285514f225c0645d09a8)
+- servidorSha.py (MD5: 40db39f103697cde1737b963932122fb990b2a72)
