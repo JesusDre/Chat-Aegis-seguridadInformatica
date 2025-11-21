@@ -31,11 +31,12 @@ HTTP_PORT = 8000
 WEB_DIR = os.path.join(os.path.dirname(__file__), 'web')
 
 
-async def proxy_handler(websocket, path, tcp_host, tcp_port):
+async def proxy_handler(websocket, tcp_host, tcp_port):
     """Handle a websocket client by opening a TCP connection to the chat server
     and relaying messages both ways.
     """
-    print(f'WS client connected: {getattr(websocket, "remote_address", None)} path={path}')
+    print(f'WS client connected: {getattr(websocket, "remote_address", None)}')
+
     try:
         reader, writer = await asyncio.open_connection(tcp_host, tcp_port)
         print(f'  TCP connection established to {tcp_host}:{tcp_port} for WS client {getattr(websocket, "remote_address", None)}')
@@ -136,7 +137,11 @@ def start_http_server(port=HTTP_PORT, web_dir=WEB_DIR):
 
 async def main(tcp_host, tcp_port, ws_host=WS_HOST, ws_port=WS_PORT):
     print(f'Starting WebSocket proxy on ws://{ws_host}:{ws_port}/ -> TCP {tcp_host}:{tcp_port}')
-    async with websockets.serve(lambda ws, path: proxy_handler(ws, path, tcp_host, tcp_port), ws_host, ws_port):
+    async with websockets.serve(
+    lambda ws: proxy_handler(ws, tcp_host, tcp_port),
+    ws_host,
+    ws_port
+    ):
         await asyncio.Future()  # run forever
 
 
