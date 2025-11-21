@@ -1,21 +1,144 @@
 <!doctype html>
 <html lang="es">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Chat Aegis - Web</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; }
-    header { background:#2b6cb0; color:white; padding:12px 16px; }
-    #chat { flex: 1; padding:16px; overflow:auto; background:#f7fafc; }
-    #controls { display:flex; padding:12px; gap:8px; background:#edf2f7; }
-    #msg { flex:1; padding:8px; }
-    .message { margin-bottom:8px; }
-    .me { color:#2b6cb0; font-weight:600; }
-    .server { color:#2d3748; }
-    .meta { font-size:0.85em; color:#718096; }
+    #signature-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      display: none;
+      /* oculto por defecto */
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    /* Tarjeta central */
+    #signature-card {
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+      max-width: 520px;
+      width: 90%;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      font-family: sans-serif;
+    }
+
+    /* Encabezado */
+    .signature-header {
+      background: #1976d2;
+      color: #fff;
+      padding: 10px 16px;
+      font-weight: bold;
+    }
+
+    /* Cuerpo */
+    .signature-body {
+      display: flex;
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .signature-illustration img {
+      width: 120px;
+      max-height: 90px;
+      object-fit: contain;
+    }
+
+    .signature-text p {
+      margin: 4px 0;
+      font-size: 14px;
+    }
+
+    /* Botones */
+    .signature-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 10px 16px 12px;
+      background: #f3f3f3;
+    }
+
+    .signature-actions button {
+      padding: 6px 12px;
+      border-radius: 4px;
+      border: 1px solid #b0bec5;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    #signature-cancel {
+      background: #ffffff;
+    }
+
+    #signature-confirm {
+      background: #1976d2;
+      color: #ffffff;
+      border-color: #1976d2;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    header {
+      background: #2b6cb0;
+      color: white;
+      padding: 12px 16px;
+    }
+
+    #chat {
+      flex: 1;
+      padding: 16px;
+      overflow: auto;
+      background: #f7fafc;
+    }
+
+    #controls {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 12px;
+      gap: 8px;
+      background: #edf2f7;
+      align-items: center;
+    }
+
+    #msg {
+      flex: 1;
+      padding: 8px;
+    }
+
+    .message {
+      margin-bottom: 8px;
+    }
+
+    .me {
+      color: #2b6cb0;
+      font-weight: 600;
+    }
+
+    .server {
+      color: #2d3748;
+    }
+
+    .meta {
+      font-size: 0.85em;
+      color: #718096;
+    }
   </style>
 </head>
+
 <body>
   <header>
     <div style="display:flex;align-items:center;gap:12px;">
@@ -23,14 +146,54 @@
       <div style="margin-left:auto;">WebSocket: <span id="ws-status">desconectado</span></div>
     </div>
   </header>
+
+  <!-- Área de chat -->
   <div id="chat" aria-live="polite"></div>
+
+  <!-- Controles de conexión y chat -->
   <div id="controls">
     <input id="host" placeholder="ws host (default localhost)" value="localhost" style="width:150px" />
     <input id="wsport" placeholder="ws port" value="8765" style="width:70px" />
     <button id="btn-connect">Conectar</button>
+
     <input id="msg" placeholder="Escribe un mensaje..." />
     <button id="btn-send">Enviar</button>
+
+    <label for="upload">Archivo:</label>
+    <input type="file" id="upload">
+    <button id="btn-preview" disabled>Ver una sola vez</button>
+    <button id="btn-sign" disabled>Confirmar</button>
   </div>
+
+  <!-- Panel de firma digital (oculto por defecto) -->
+  <div id="signature-overlay">
+    <div id="signature-card">
+      <div class="signature-header">Confirmar firma</div>
+
+      <div class="signature-body">
+        <!-- Usa aquí la imagen que mandaste -->
+        <div class="signature-illustration">
+          <img src="firma_digital.png" alt="Firma digital">
+        </div>
+
+        <div class="signature-text">
+          <p><strong>Documento:</strong> <span id="signature-doc-name">–</span></p>
+          <p>
+            Al confirmar, este documento se enviará al servidor para
+            aplicar la firma digital. Esta acción no se puede deshacer.
+          </p>
+        </div>
+      </div>
+
+      <div class="signature-actions">
+        <button id="signature-cancel">Cancelar</button>
+        <button id="signature-confirm">Firmar documento</button>
+      </div>
+    </div>
+  </div>
+
+
   <script src="app.js"></script>
 </body>
+
 </html>

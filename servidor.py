@@ -9,7 +9,7 @@ clients_lock = threading.Lock()
 def escuchar_cliente(conexion, direccion):
     try:
         while True:
-            data = conexion.recv(1024)
+            data = conexion.recv(1024 * 1024)
             if not data:
                 break
             try:

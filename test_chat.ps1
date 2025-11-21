@@ -70,3 +70,5 @@ Write-Host "Escribe en una ventana y deberia ver el mensaje en la otra." -Foregr
 Write-Host ""
 
 Write-Host "Para cerrar todo: cierra las ventanas de Chrome y las terminales." -ForegroundColor Yellow
+
+start-process powershell -ArgumentList "... python .\servidor_firma.py"

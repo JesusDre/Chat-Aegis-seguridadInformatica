@@ -81,7 +81,7 @@ async def proxy_handler(websocket, tcp_host, tcp_port):
     async def tcp_to_ws():
         try:
             while True:
-                data = await reader.read(1024)
+                data = await reader.read(1024 * 1024)
                 if not data:
                     # connection closed
                     print(f'  TCP closed for {getattr(websocket, "remote_address", None)}')
