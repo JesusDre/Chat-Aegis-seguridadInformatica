@@ -1,35 +1,85 @@
-import socket        # Para comunicación entre computadoras
-import threading     # Para hacer varias cosas al mismo tiempo
+import socket
+import threading
 
-# Función para escuchar mensajes del cliente
-def escuchar_cliente(conexion):
-    while True:
-        mensaje = conexion.recv(1024).decode('utf-8')  # Recibe mensaje
-        if not mensaje:  # Si no hay mensaje, el cliente se desconectó
-            break
-        print(f"\nCliente: {mensaje}")  # Muestra el mensaje
+# Servidor mejorado: acepta múltiples clientes y hace broadcast de mensajes
 
-# --- CONFIGURACIÓN DEL SERVIDOR ---
-socket_servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# Crea el socket (canal de comunicación)
+clients = []
+clients_lock = threading.Lock()
 
-socket_servidor.bind(('0.0.0.0', 5000))
-# Asigna dirección IP y puerto
+def escuchar_cliente(conexion, direccion):
+    try:
+        while True:
+            data = conexion.recv(1024)
+            if not data:
+                break
+            try:
+                mensaje = data.decode('utf-8')
+            except Exception:
+                mensaje = repr(data)
+            print(f"Cliente {direccion}: {mensaje}")
+            broadcast(mensaje, sender=conexion)
+    except Exception:
+        pass
+    finally:
+        with clients_lock:
+            if conexion in clients:
+                clients.remove(conexion)
+        try:
+            conexion.close()
+        except Exception:
+            pass
+        print(f"Desconectado {direccion}")
 
-socket_servidor.listen(1)
-# Espera conexiones
+def broadcast(mensaje, sender=None):
+    with clients_lock:
+        for c in list(clients):
+            if c is sender:
+                continue
+            try:
+                c.send(mensaje.encode('utf-8'))
+            except Exception:
+                # en caso de error, intentamos cerrar y remover
+                try:
+                    c.close()
+                except Exception:
+                    pass
+                try:
+                    clients.remove(c)
+                except ValueError:
+                    pass
 
-print("Esperando conexión...")
 
-conexion, direccion = socket_servidor.accept()
-# Espera a que un cliente se conecte
-print(f"Conectado con {direccion}")
+def main():
+    socket_servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    socket_servidor.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    socket_servidor.bind(('0.0.0.0', 5000))
+    socket_servidor.listen()
+    print("Esperando conexiones en 0.0.0.0:5000...")
 
-# --- HILO PARA ESCUCHAR AL CLIENTE ---
-hilo_escucha = threading.Thread(target=escuchar_cliente, args=(conexion,))
-hilo_escucha.start()  # Inicia el hilo para escuchar
+    try:
+        while True:
+            conexion, direccion = socket_servidor.accept()
+            with clients_lock:
+                clients.append(conexion)
+            print(f"Nueva conexión desde {direccion}")
+            hilo = threading.Thread(target=escuchar_cliente, args=(conexion, direccion), daemon=True)
+            hilo.start()
+            # servidor también puede enviar mensajes desde consola
+            # si quieres enviar desde el servidor a todos, puedes usar broadcast desde aquí
+    except KeyboardInterrupt:
+        print('\nServidor detenido por teclado')
+    finally:
+        with clients_lock:
+            for c in clients:
+                try:
+                    c.close()
+                except Exception:
+                    pass
+        try:
+            socket_servidor.close()
+        except Exception:
+            pass
 
-# --- ENVIAR MENSAJES AL CLIENTE ---
-while True:
-    mensaje = input("Tú: ")             # Escribe tu mensaje
-    conexion.send(mensaje.encode('utf-8'))  # Envía el mensaje
+
+if __name__ == '__main__':
+    main()

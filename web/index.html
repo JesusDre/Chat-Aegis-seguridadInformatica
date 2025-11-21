@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Chat Aegis - Web</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; }
+    header { background:#2b6cb0; color:white; padding:12px 16px; }
+    #chat { flex: 1; padding:16px; overflow:auto; background:#f7fafc; }
+    #controls { display:flex; padding:12px; gap:8px; background:#edf2f7; }
+    #msg { flex:1; padding:8px; }
+    .message { margin-bottom:8px; }
+    .me { color:#2b6cb0; font-weight:600; }
+    .server { color:#2d3748; }
+    .meta { font-size:0.85em; color:#718096; }
+  </style>
+</head>
+<body>
+  <header>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div><strong>Chat Aegis (web)</strong></div>
+      <div style="margin-left:auto;">WebSocket: <span id="ws-status">desconectado</span></div>
+    </div>
+  </header>
+  <div id="chat" aria-live="polite"></div>
+  <div id="controls">
+    <input id="host" placeholder="ws host (default localhost)" value="localhost" style="width:150px" />
+    <input id="wsport" placeholder="ws port" value="8765" style="width:70px" />
+    <button id="btn-connect">Conectar</button>
+    <input id="msg" placeholder="Escribe un mensaje..." />
+    <button id="btn-send">Enviar</button>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

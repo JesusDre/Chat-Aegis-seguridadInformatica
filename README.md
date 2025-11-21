@@ -91,3 +91,64 @@ Version 1.10 - Chat con cifrado simétrico y asimétrico
 Version 1.20 -Chat con SHA256
 - clienteSha.py (MD5: 0185d1f222496ce1b1c2285514f225c0645d09a8)
 - servidorSha.py (MD5: 40db39f103697cde1737b963932122fb990b2a72)
+
+## Frontend (Interfaz gráfica)
+
+Se agregó un cliente con interfaz gráfica usando Tkinter: `cliente_gui.py`.
+
+Cómo usar el frontend:
+
+1. Abrir una terminal y ejecutar el servidor (en la carpeta raíz del proyecto):
+
+   ```powershell
+   python .\servidor.py
+   ```
+
+2. En otra terminal (o desde el Explorador), ejecutar la GUI del cliente:
+
+   ```powershell
+   python .\cliente_gui.py
+   ```
+
+3. En la ventana del cliente, ingresar la dirección del servidor (por defecto 127.0.0.1) y el puerto (por defecto 5000), luego hacer clic en "Conectar". Escribir mensajes y presionar Enter o el botón "Enviar".
+
+Notas:
+- La GUI usa sockets TCP y el mismo protocolo simple que `cliente.py`/`servidor.py` (texto UTF-8). 
+- Si quieres probar múltiples instancias de cliente, ejecuta varias copias de `cliente_gui.py`.
+- Cerrar la ventana del cliente cerrará su socket y terminará la conexión limpiamente.
+
+## Frontend web (HTML)
+
+Hay una interfaz web que usa WebSockets. Como los navegadores no pueden abrir sockets TCP crudos,
+se provee un pequeño proxy que traduce WebSocket <-> TCP para comunicar la página con `servidor.py`.
+
+Archivo principal del proxy: `ws_proxy.py`.
+
+Pasos para usar la interfaz web:
+
+1. Instala dependencias (recomendado crear un entorno virtual):
+
+   ```powershell
+   python -m venv .venv; .\.venv\Scripts\Activate.ps1; pip install -r requirements.txt
+   ```
+
+2. Ejecuta primero el servidor Python tradicional:
+
+   ```powershell
+   python .\servidor.py
+   ```
+
+3. En otra terminal ejecuta el proxy WebSocket (esto también inicia un servidor HTTP para los archivos estáticos):
+
+   ```powershell
+   python .\ws_proxy.py
+   ```
+
+   - El proxy por defecto intentará conectar al servidor TCP en 127.0.0.1:5000.
+   - Servirá la página en http://localhost:8000/ y el endpoint WebSocket en ws://localhost:8765/.
+
+4. Abre en Chrome la URL mostrada por el proxy (por defecto http://localhost:8000/) y usa la UI para conectar y chatear.
+
+Notas:
+- Si tu `servidor.py` usa otra IP/puerto, arranca `ws_proxy.py` con `--tcp-host` y `--tcp-port`.
+- El proxy está pensado como una solución simple para testing/local; para producción usa HTTPS/WSS y autenticación.

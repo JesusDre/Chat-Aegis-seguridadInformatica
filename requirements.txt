@@ -1,0 +1,2 @@
+websockets>=10.0
+# Optional: if you prefer aiohttp instead, adapt ws_proxy.py accordingly
